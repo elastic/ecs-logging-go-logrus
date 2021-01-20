@@ -19,6 +19,8 @@ package ecslogrus
 
 import (
 	"runtime"
+	"strconv"
+	"strings"
 
 	"github.com/sirupsen/logrus"
 )
@@ -33,8 +35,6 @@ var (
 		logrus.FieldKeyTime:  "@timestamp",
 		logrus.FieldKeyMsg:   "message",
 		logrus.FieldKeyLevel: "log.level",
-		logrus.FieldKeyFile:  "log.origin.file.name",
-		logrus.FieldKeyFunc:  "log.origin.function",
 	}
 )
 
@@ -91,9 +91,43 @@ func (f *Formatter) Format(e *logrus.Entry) ([]byte, error) {
 			data[f.DataKey] = extraData
 		}
 	}
+	if e.HasCaller() {
+		// Logrus has a single configurable field (logrus.FieldKeyFile)
+		// for storing a combined filename and line number, but we want
+		// to split them apart into two fields. Remove the event's Caller
+		// field, and encode the ECS fields explicitly.
+		var funcVal, fileVal string
+		var lineVal int
+		if f.CallerPrettyfier != nil {
+			var fileLineVal string
+			funcVal, fileLineVal = f.CallerPrettyfier(e.Caller)
+			if sep := strings.IndexRune(fileLineVal, ':'); sep != -1 {
+				fileVal = fileLineVal[:sep]
+				lineVal, _ = strconv.Atoi(fileLineVal[sep+1:])
+			} else {
+				fileVal = fileLineVal
+				lineVal = 0
+			}
+		} else {
+			funcVal = e.Caller.Function
+			fileVal = e.Caller.File
+			lineVal = e.Caller.Line
+		}
+		e.Caller = nil
+		if funcVal != "" {
+			data["log.origin.function"] = funcVal
+		}
+		if fileVal != "" {
+			data["log.origin.file.name"] = fileVal
+		}
+		if lineVal > 0 {
+			data["log.origin.file.line"] = lineVal
+		}
+	}
 	data["ecs.version"] = ecsVersion
 	ecopy := *e
 	ecopy.Data = data
+	ecopy.Caller = nil
 	e = &ecopy
 
 	jf := logrus.JSONFormatter{

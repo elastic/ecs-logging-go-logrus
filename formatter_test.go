@@ -40,14 +40,14 @@ func TestFormatter(t *testing.T) {
 	var buf bytes.Buffer
 	log := newLogger(&buf, &ecslogrus.Formatter{
 		DataKey:          "labels",
-		CallerPrettyfier: func(*runtime.Frame) (function string, file string) { return "function_name", "file_name" },
+		CallerPrettyfier: func(*runtime.Frame) (function string, file string) { return "function_name", "file_name:123" },
 	})
 
 	epoch := time.Unix(0, 0).UTC()
 	err := errors.New("oy vey")
 	log.WithTime(epoch).WithError(err).WithField("custom", "field").Error("oh noes")
 	assert.Equal(t,
-		`{"@timestamp":"1970-01-01T00:00:00.000Z","ecs.version":"1.6.0","error":{"message":"oy vey"},"labels":{"custom":"field"},"log.level":"error","log.origin.file.name":"file_name","log.origin.function":"function_name","message":"oh noes"}`+"\n",
+		`{"@timestamp":"1970-01-01T00:00:00.000Z","ecs.version":"1.6.0","error":{"message":"oy vey"},"labels":{"custom":"field"},"log.level":"error","log.origin.file.line":123,"log.origin.file.name":"file_name","log.origin.function":"function_name","message":"oh noes"}`+"\n",
 		buf.String(),
 	)
 }
@@ -65,9 +65,7 @@ func TestSpecValidation(t *testing.T) {
 	})
 	t.Run("caller", func(t *testing.T) {
 		var buf bytes.Buffer
-		log := newLogger(&buf, &ecslogrus.Formatter{
-			CallerPrettyfier: func(*runtime.Frame) (function string, file string) { return "function_name", "file_name" },
-		})
+		log := newLogger(&buf, &ecslogrus.Formatter{})
 		log.Info()
 
 		var decoded map[string]interface{}
