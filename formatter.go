@@ -127,7 +127,6 @@ func (f *Formatter) Format(e *logrus.Entry) ([]byte, error) {
 	data["ecs.version"] = ecsVersion
 	ecopy := *e
 	ecopy.Data = data
-	ecopy.Caller = nil
 	e = &ecopy
 
 	jf := logrus.JSONFormatter{
