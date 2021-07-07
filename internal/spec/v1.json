@@ -9,7 +9,11 @@
             "type": "datetime",
             "required": true,
             "index": 0,
-            "url": "https://www.elastic.co/guide/en/ecs/current/ecs-base.html"
+            "url": "https://www.elastic.co/guide/en/ecs/current/ecs-base.html",
+            "comment": [
+                "Field order, as specified by 'index', is RECOMMENDED.",
+                "ECS loggers must implement field order unless the logging framework makes that impossible."
+            ]
         },
         "log.level": {
             "type": "string",
@@ -27,9 +31,13 @@
         },
         "message": {
             "type": "string",
-            "required": true,
+            "required": false,
             "index": 2,
-            "url": "https://www.elastic.co/guide/en/ecs/current/ecs-base.html"
+            "url": "https://www.elastic.co/guide/en/ecs/current/ecs-base.html",
+            "comment": [
+                "A message field is typically included in all log records, but some logging libraries allow records with no message.",
+                "That's typically the case for libraries that allow for structured logging."
+            ]
         },
         "ecs.version": {
             "type": "string",
@@ -65,7 +73,16 @@
             "url": "https://www.elastic.co/guide/en/ecs/current/ecs-service.html",
             "comment": [
                 "Configurable by users.",
-                "When an APM agent is active, they should auto-configure it if not already set."
+                "When an APM agent is active, it should auto-configure this field if not already set."
+            ]
+        },
+        "service.node.name": {
+            "type": "string",
+            "required": false,
+            "url": "https://www.elastic.co/guide/en/ecs/current/ecs-service.html",
+            "comment": [
+                "Configurable by users.",
+                "When an APM agent is active and `service_node_name` is manually configured, the agent should auto-configure this field if not already set."
             ]
         },
         "event.dataset": {
