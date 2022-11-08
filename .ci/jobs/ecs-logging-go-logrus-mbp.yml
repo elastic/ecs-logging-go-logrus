@@ -1,5 +1,0 @@
----
-- job:
-    name: apm-agent-go/ecs-logging-go-logrus-mbp
-    display-name: ecs-logging-go-logrus
-    description: Logging encoder for ECS compatible logs using logrus.
