@@ -26,13 +26,6 @@ jobs:
     - name: Run test
       run: go test -v ./...
 
-    - name: Store test results
-      if: success() || failure()
-      uses: actions/upload-artifact@v3
-      with:
-        name: test-results
-        path: build/*.xml
-
   pre-commit:
     name: Run pre-commit
     runs-on: ubuntu-latest
