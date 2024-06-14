@@ -46,9 +46,14 @@ type Formatter struct {
 	// DataKey allows users to put all the log entry parameters into a
 	// nested dictionary at a given key.
 	//
-	// DataKey is ignored for well-defined fields, such as "error",
+	// DataKey is ignored for well-defined fields, such as "error" and "service.name",
 	// which will instead be stored under the appropriate ECS fields.
 	DataKey string
+
+	// ServiceName name of the service logs are collected from.
+	//
+	// ServiceName is overridden if "service.name" is already added as field on the log entry.
+	ServiceName string
 
 	// CallerPrettyfier can be set by the user to modify the content
 	// of the function and file keys in the json data when ReportCaller is
@@ -83,6 +88,9 @@ func (f *Formatter) Format(e *logrus.Entry) ([]byte, error) {
 					break
 				}
 				fallthrough // error has unexpected type
+			case "service.name":
+				data["service.name"] = v
+				break
 			default:
 				extraData[k] = v
 			}
@@ -122,6 +130,11 @@ func (f *Formatter) Format(e *logrus.Entry) ([]byte, error) {
 		}
 		if lineVal > 0 {
 			data["log.origin.file.line"] = lineVal
+		}
+	}
+	if f.ServiceName != "" {
+		if _, ok := data["service.name"]; !ok {
+			data["service.name"] = f.ServiceName
 		}
 	}
 	data["ecs.version"] = ecsVersion

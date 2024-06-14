@@ -115,6 +115,32 @@ The example above produces the following log output:
 ----
 
 [float]
+[[service-name]]
+==== Include service name
+
+[source,go]
+----
+log := logrus.New()
+log.SetFormatter(&ecslogrus.Formatter{
+    ServiceName: "my-service",
+})
+log.Info("hello")
+----
+
+The example above produces the following log output:
+
+[source,json]
+----
+{
+  "@timestamp": "2022-09-13T09:58:56.217+0200",
+  "ecs.version": "1.6.0",
+  "log.level": "info",
+  "message": "hello",
+  "service.name": "my-service"
+}
+----
+
+[float]
 [[setup-step-3]]
 === Step 3: Configure Filebeat
 

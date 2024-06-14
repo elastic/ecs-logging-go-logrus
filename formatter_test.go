@@ -40,6 +40,7 @@ func TestFormatter(t *testing.T) {
 	var buf bytes.Buffer
 	log := newLogger(&buf, &ecslogrus.Formatter{
 		DataKey:          "labels",
+		ServiceName:      "my-service",
 		CallerPrettyfier: func(*runtime.Frame) (function string, file string) { return "function_name", "file_name:123" },
 	})
 
@@ -47,7 +48,7 @@ func TestFormatter(t *testing.T) {
 	err := errors.New("oy vey")
 	log.WithTime(epoch).WithError(err).WithField("custom", "field").Error("oh noes")
 	assert.Equal(t,
-		`{"@timestamp":"1970-01-01T00:00:00.000Z","ecs.version":"1.6.0","error":{"message":"oy vey"},"labels":{"custom":"field"},"log.level":"error","log.origin.file.line":123,"log.origin.file.name":"file_name","log.origin.function":"function_name","message":"oh noes"}`+"\n",
+		`{"@timestamp":"1970-01-01T00:00:00.000Z","ecs.version":"1.6.0","error":{"message":"oy vey"},"labels":{"custom":"field"},"log.level":"error","log.origin.file.line":123,"log.origin.file.name":"file_name","log.origin.function":"function_name","message":"oh noes","service.name":"my-service"}`+"\n",
 		buf.String(),
 	)
 }
@@ -79,6 +80,16 @@ func TestSpecValidation(t *testing.T) {
 
 		var decoded map[string]interface{}
 		require.NoError(t, json.Unmarshal(buf.Bytes(), &decoded))
+		validateSpec(t, decoded, spec.V1)
+	})
+	t.Run("service.name", func(t *testing.T) {
+		var buf bytes.Buffer
+		log := newLogger(&buf, &ecslogrus.Formatter{ServiceName: "my-service"})
+		log.Info()
+
+		var decoded map[string]interface{}
+		require.NoError(t, json.Unmarshal(buf.Bytes(), &decoded))
+		require.Equal(t, "my-service", decoded["service.name"])
 		validateSpec(t, decoded, spec.V1)
 	})
 }
