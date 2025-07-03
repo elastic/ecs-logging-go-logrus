@@ -1,0 +1,11 @@
+project: 'ECS Logging Go (Logrus)'
+products:
+  - id: ecs-logging
+cross_links:
+  - beats
+  - ecs
+  - ecs-logging
+toc:
+  - toc: reference
+subs:
+  filebeat:   "Filebeat"
