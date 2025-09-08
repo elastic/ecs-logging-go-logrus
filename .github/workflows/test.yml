@@ -19,7 +19,7 @@ jobs:
     - name: Fetch Go version from .go-version
       run: echo "GO_VERSION=$(cat .go-version)" >> $GITHUB_ENV
 
-    - uses: actions/setup-go@v5
+    - uses: actions/setup-go@v6
       with:
         go-version: ${{ env.GO_VERSION }}
 
