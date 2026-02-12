@@ -113,6 +113,11 @@ The example above produces the following log output:
 
 ## Step 3: Configure Filebeat [setup-step-3]
 
+```{applies_to}
+stack: ga
+serverless: unavailable
+```
+
 :::::::{tab-set}
 
 ::::::{tab-item} Log file
