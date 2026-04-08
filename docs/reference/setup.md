@@ -1,7 +1,12 @@
 ---
+applies_to:
+  stack: ga
+  serverless: ga
 mapped_pages:
   - https://www.elastic.co/guide/en/ecs-logging/go-logrus/current/setup.html
 navigation_title: Get started
+products:
+  - id: ecs-logging
 ---
 
 # Get started with ECS Logging Go (Logrus) [setup]
@@ -107,6 +112,11 @@ The example above produces the following log output:
 
 
 ## Step 3: Configure Filebeat [setup-step-3]
+
+```{applies_to}
+stack: ga
+serverless: unavailable
+```
 
 :::::::{tab-set}
 
